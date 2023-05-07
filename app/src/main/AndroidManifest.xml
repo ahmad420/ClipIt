@@ -13,7 +13,7 @@
         android:theme="@style/Theme.Clipit"
         tools:targetApi="31">
         <activity
-            android:name=".Spalsh_Screen"
+            android:name=".Splash_Screen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

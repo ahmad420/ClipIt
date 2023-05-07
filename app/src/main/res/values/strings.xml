@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Clipit</string>
+    <string name="logo2">logo2</string>
+    <string name="logo1">logo1</string>
+
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="android:statusBarColor">@color/design_default_color_primary_dark</item>
     </style>
