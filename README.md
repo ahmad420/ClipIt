@@ -19,6 +19,12 @@ ClipIt is a mobile app designed for customers of our barbershop to book appointm
 - Firebase Authentication
 - Firebase Realtime Database
 
+## Figma UI Design
+
+We used Figma to design the UI of our app. You can view our design at the following link:
+
+- [ClipIt UI Design on Figma](https://www.figma.com/file/a0ijDsEtNOEhTewIOCYKPr/BarberShop-Appointment-booking?type=design&node-id=0%3A1&t=9d2yWVpxxWDlCX4P-1)
+
 ## Getting Started
 
 To get started with the app, you will need to clone the repository to your local machine and import the project into Android Studio. From there, you can build and run the app on an Android emulator or a physical device.
