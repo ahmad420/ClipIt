@@ -2,6 +2,15 @@
     <string name="app_name">Clipit</string>
     <string name="logo2">logo2</string>
     <string name="logo1">logo1</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="forgot_your_password">Forgot your password?</string>
+    <string name="log_in">Log in</string>
+    <string name="log_in_text">Log In</string>
+    <string name="register">Register</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="go_to_login_page">Have an Account? Log in Now !</string>
+    <string name="register_btn">Register</string>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="android:statusBarColor">@color/design_default_color_primary_dark</item>
