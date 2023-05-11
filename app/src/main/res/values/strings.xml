@@ -11,6 +11,9 @@
     <string name="confirm_password">Confirm Password</string>
     <string name="go_to_login_page">Have an Account? Log in Now !</string>
     <string name="register_btn">Register</string>
+    <string name="home">Home</string>
+    <string name="contact_us">contact us</string>
+    <string name="profile">Profile</string>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="android:statusBarColor">@color/design_default_color_primary_dark</item>
