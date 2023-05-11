@@ -8,10 +8,10 @@
 
     <ImageView
         android:id="@+id/logo_image_view"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:layout_gravity="center"
-        android:src="@drawable/logo"
+        android:src="@drawable/clip_it_logo"
         app:cardCornerRadius="75dp"
         android:contentDescription="@string/logo1"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,18 +21,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.499" />
 
-    <ImageView
-        android:id="@+id/stash_logo"
-        android:layout_width="153dp"
-        android:layout_height="137dp"
-        android:layout_gravity="center"
-        android:src="@drawable/stash"
-        app:cardCornerRadius="75dp"
-        android:contentDescription="@string/logo2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo_image_view"
-        app:layout_constraintVertical_bias="0.155" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
