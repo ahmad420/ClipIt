@@ -5,7 +5,7 @@ ClipIt is a mobile app designed for customers of our barbershop to book appointm
 
 </p>
 <p align="center">
-  <img src="app/src/main/res/drawable-v24/ClipItLogoObiacity0.png"  alt="app logo" style="width: 300px; height: 300px;">
+  <img src="app/src/main/res/drawable-v24/clipit_logo_obiacity_0.png"  alt="app logo" style="width: 300px; height: 300px;">
 </p>
 
 ## Features
