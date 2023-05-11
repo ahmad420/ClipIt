@@ -17,10 +17,10 @@ public class Splash_Screen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         ImageView Logo;
 
-        super.onCreate(savedInstanceState);
+
 
         setContentView(R.layout.activity_spalsh_screen);
-
+        super.onCreate(savedInstanceState);
         Logo = findViewById(R.id.logo_image_view);
 
 

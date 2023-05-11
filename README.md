@@ -1,6 +1,12 @@
 # ClipIt - BarberShop Appointment Booking App
-
+<p align="center">
 ClipIt is a mobile app designed for customers of our barbershop to book appointments at their convenience. The app allows customers to view our available services, and book appointments with their favorite barber.
+ <hr style="border: none; border-top: 2px solid gray;">
+
+</p>
+<p align="center">
+  <img src="app/src/main/res/drawable-v24/ClipItLogoObiacity0.png"  alt="app logo" style="width: 300px; height: 300px;">
+</p>
 
 ## Features
 
