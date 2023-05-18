@@ -13,7 +13,7 @@
         android:layout_height="325dp"
         android:layout_gravity="center"
         android:contentDescription="@string/logo1"
-        android:src="@drawable/clip_it_logo_obiacity0"
+        android:src="@drawable/clipit_logo_obiacity_0"
         app:cardCornerRadius="75dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -35,7 +35,7 @@ public class Splash_Screen extends AppCompatActivity {
             @Override
             public void run() {
 
-                Intent intent = new Intent(Splash_Screen.this, Booking_Calendar.class);
+                Intent intent = new Intent(Splash_Screen.this, contact_us.class);
                 startActivity(intent);
                 finish();
             }
