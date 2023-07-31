@@ -15,6 +15,7 @@
     <string name="contact_us">contact us</string>
     <string name="profile">Profile</string>
     <string name="Full_name">full name</string>
+    <string name="have_an_account">register now !</string>
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
         <item name="android:statusBarColor">@color/design_default_color_primary_dark</item>
