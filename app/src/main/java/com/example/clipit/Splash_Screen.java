@@ -9,6 +9,8 @@ import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 
+import com.google.firebase.FirebaseApp;
+
 public class Splash_Screen extends AppCompatActivity {
 
     private static final float ROTATE_FROM = 30.0f;
@@ -17,6 +19,7 @@ public class Splash_Screen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         ImageView Logo;
 
+        FirebaseApp.initializeApp(this);
 
 
         setContentView(R.layout.activity_spalsh_screen);
@@ -35,7 +38,7 @@ public class Splash_Screen extends AppCompatActivity {
             @Override
             public void run() {
 
-                Intent intent = new Intent(Splash_Screen.this, MainActivity.class);
+                Intent intent = new Intent(Splash_Screen.this, Register.class);
                 startActivity(intent);
                 finish();
             }
