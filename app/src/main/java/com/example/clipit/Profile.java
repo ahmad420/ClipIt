@@ -1,13 +1,16 @@
 package com.example.clipit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -15,13 +18,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 
-public class Profile extends AppCompatActivity implements View.OnClickListener {
+public class Profile extends AppCompatActivity implements View.OnClickListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
 
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private ListenerRegistration userListener;
-
+    private BottomNavigationView bottomNavigationView;
     private TextView textViewEmail;
     private TextView textViewName;
     private Button buttonLogout;
@@ -39,6 +42,9 @@ public class Profile extends AppCompatActivity implements View.OnClickListener {
         buttonLogout = findViewById(R.id.buttonLogout);
 
         buttonLogout.setOnClickListener(this);
+
+        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
         // Fetch and display user data
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -84,6 +90,28 @@ public class Profile extends AppCompatActivity implements View.OnClickListener {
     }
 
     @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.home:
+                // Handle Home menu item selection
+                // Example: navigate to HomeFragment
+                navigateToHomeFragment();
+                return true;
+            case R.id.contact:
+                // Handle Contact Us menu item selection
+                // Example: navigate to ContactFragment
+                navigateToContactFragment();
+                return true;
+            case R.id.profile:
+                // Handle Profile menu item selection
+                // Example: navigate to ProfileFragment
+                navigateToProfileFragment();
+                return true;
+            default:
+                return false;
+        }
+    }
+    @Override
     protected void onStop() {
         super.onStop();
         // Remove the Firestore listener when the activity is stopped
@@ -103,4 +131,23 @@ public class Profile extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
+
+
+    private void navigateToHomeFragment() {
+        Intent intent = new Intent(Profile.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void navigateToContactFragment() {
+        Intent intent = new Intent(Profile.this, Booking_Calendar.class);
+        startActivity(intent);
+        finish();
+    }
+
+    private void navigateToProfileFragment() {
+        Intent intent = new Intent(Profile.this, Profile.class);
+        startActivity(intent);
+        finish();    }
 }
+

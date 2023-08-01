@@ -29,7 +29,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
     Button buttonLogin;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
-    TextView textView, theMsg2;
+    TextView textView, theMsg2,goRegieter;
 
 //    @Override
 //    public void onStart() {
@@ -70,21 +70,38 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.forgot_password_link);
         theMsg2 = findViewById(R.id.msg);
+        goRegieter=findViewById(R.id.goRegieter);
     }
 
     private void loginAction(View view) {
-        progressBar.setVisibility(View.VISIBLE);
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
         String email, password;
-        email = String.valueOf(editTextEmail.getText());
-        password = String.valueOf(editTextPassword.getText());
+        if (editTextEmail != null && editTextPassword != null) {
+            email = editTextEmail.getText().toString();
+            password = editTextPassword.getText().toString();
+        } else {
+            // Handle the case where editTextEmail or editTextPassword is null
+            theMsg2.setText("Error: Please try again later");
+            return;
+        }
+
         setProgressBar();
+
         if (TextUtils.isEmpty(email)) {
-            theMsg2.setText("Email is empty");
+            if (theMsg2 != null) {
+                theMsg2.setText("Email is empty");
+            }
             Toast.makeText(Login.this, "Enter email", Toast.LENGTH_SHORT).show();
             return;
         }
+
         if (TextUtils.isEmpty(password)) {
-            theMsg2.setText("Password is empty");
+            if (theMsg2 != null) {
+                theMsg2.setText("Password is empty");
+            }
             Toast.makeText(Login.this, "Enter password", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -93,23 +110,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressBar.setVisibility(View.GONE);
+                        if (progressBar != null) {
+                            progressBar.setVisibility(View.GONE);
+                        }
                         if (task.isSuccessful()) {
                             Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                             startActivity(intent);
-                            finish();
                         } else {
-                            theMsg2.setText("Authentication failed");
+                            if (theMsg2 != null) {
+                                theMsg2.setText("Authentication failed");
+                            }
                             Toast.makeText(Login.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
-
     private void initButtons() {
         buttonLogin.setOnClickListener(this);
         textView.setOnClickListener(this);
+        goRegieter.setOnClickListener(this);
+
     }
 
     public void goToRegisterPage() {
@@ -125,7 +146,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
                 progressBar.setVisibility(View.GONE);
                 theMsg2.setVisibility(View.GONE);
             }
-        }, 3000);
+        }, 8000);
     }
 
     }
