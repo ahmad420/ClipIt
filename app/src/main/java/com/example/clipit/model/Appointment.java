@@ -66,6 +66,7 @@ public class Appointment {
     }
 
     public String getUserName() {
+
         return userName;
     }
 
