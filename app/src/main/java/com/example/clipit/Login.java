@@ -22,25 +22,28 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity implements View.OnClickListener  {
+
 
     EditText editTextEmail, editTextPassword;
     Button buttonLogin;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
-    TextView textView, theMsg2,goRegieter,goToResetPass;
+    TextView textView, theMsg2, goRegister, goToResetPass;
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        FirebaseUser currentUser = mAuth.getCurrentUser();
-//        if (currentUser != null) {
-//            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-//            startActivity(intent);
-//            finish();
-//        }
-//    }
+
+    public void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            Intent intent = new Intent(getApplicationContext(), Admin.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +65,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
             case R.id.forgot_password_link:
                 navToPage();
                 break;
-
         }
     }
 
@@ -74,8 +76,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.forgot_password_link);
         theMsg2 = findViewById(R.id.msg);
-        goRegieter=findViewById(R.id.goRegieter);
-        goToResetPass=findViewById(R.id.forgot_password_link);
+        goRegister = findViewById(R.id.goRegieter);
+        goToResetPass = findViewById(R.id.forgot_password_link);
     }
 
     private void loginAction(View view) {
@@ -119,9 +121,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
                             progressBar.setVisibility(View.GONE);
                         }
                         if (task.isSuccessful()) {
-                            Toast.makeText(getApplicationContext(), "Login Successful", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                            startActivity(intent);
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            if (user != null) {
+                                checkIsAdmin(user);
+                            } else {
+                                Toast.makeText(Login.this, "User is null", Toast.LENGTH_SHORT).show();
+                            }
                         } else {
                             if (theMsg2 != null) {
                                 theMsg2.setText("Authentication failed");
@@ -129,14 +134,43 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
                             Toast.makeText(Login.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
                         }
                     }
+
                 });
     }
+
+    private void checkIsAdmin(FirebaseUser user) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String userId = user.getUid();
+
+        db.collection("users").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        boolean isAdmin = documentSnapshot.getBoolean("isAdmin");
+                        if (isAdmin) {
+                            Intent intent = new Intent(getApplicationContext(), Admin.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                    } else {
+                        Toast.makeText(Login.this, "User document does not exist", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(Login.this, "Failed to fetch user data", Toast.LENGTH_SHORT).show();
+                    Log.e("Login", "Error fetching user data: " + e.getMessage());
+                });
+    }
+
+
     private void initButtons() {
         buttonLogin.setOnClickListener(this);
         textView.setOnClickListener(this);
-        goRegieter.setOnClickListener(this);
+        goRegister.setOnClickListener(this);
         goToResetPass.setOnClickListener(this);
-
     }
 
     public void goToRegisterPage() {
@@ -159,6 +193,5 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
         Intent intent = new Intent(getApplicationContext(), Forgot_Password.class);
         startActivity(intent);
         finish();
-
     }
 }

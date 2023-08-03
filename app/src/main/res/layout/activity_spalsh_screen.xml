@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#5D6BB0"
+    android:background="#E6E6E8"
     tools:context=".Splash_Screen">
 
     <ImageView
@@ -13,7 +13,7 @@
         android:layout_height="325dp"
         android:layout_gravity="center"
         android:contentDescription="@string/logo1"
-        android:src="@drawable/clipit_logo_obiacity_0"
+        android:src="@drawable/logo"
         app:cardCornerRadius="75dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

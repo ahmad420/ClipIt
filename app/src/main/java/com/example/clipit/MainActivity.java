@@ -24,7 +24,8 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNavigationView;
-    private LinearLayout appointmentsLayout; // LinearLayout to hold appointment TextViews
+    private LinearLayout appointmentsLayout;
+    private List<Appointment> userAppointments = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,9 +35,56 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
-        appointmentsLayout = findViewById(R.id.appointmentsLayout); // Initialize the appointments layout
-
+        appointmentsLayout = findViewById(R.id.appointmentsLayout);
         fetchUserAppointments();
+    }
+
+    private void completeAppointment(String appointmentId) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // Handle user not logged in
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String appointmentsCollection = "appointments";
+
+        // Update the status of the appointment to "Completed"
+        db.collection(appointmentsCollection)
+                .document(appointmentId)
+                .update("status", "Completed")
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Appointment marked as completed", Toast.LENGTH_SHORT).show();
+                    fetchUserAppointments();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to mark appointment as completed", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                });
+    }
+
+    private void deleteAppointment(String appointmentId) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser == null) {
+            // Handle user not logged in
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        String appointmentsCollection = "appointments";
+
+        // Delete the appointment from Firestore using its ID
+        db.collection(appointmentsCollection)
+                .document(appointmentId)
+                .delete()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Appointment deleted successfully", Toast.LENGTH_SHORT).show();
+                    fetchUserAppointments();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Failed to delete appointment", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace();
+                });
     }
 
     private void fetchUserAppointments() {
@@ -49,82 +97,52 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
 
             // Query appointments collection to get user's appointments
             db.collection(appointmentsCollection)
-                    .whereEqualTo("userId", userId) // userId is the ID of the logged-in user
+                    .whereEqualTo("userId", userId)
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
-                        appointmentsLayout.removeAllViews(); // Clear existing views
-
-                        List<Appointment> userAppointments = new ArrayList<>();
+                        appointmentsLayout.removeAllViews();
+                        userAppointments = new ArrayList<>();
                         for (QueryDocumentSnapshot documentSnapshot : querySnapshot) {
-                            // Convert each document to an Appointment object and add to the list
                             Appointment appointment = documentSnapshot.toObject(Appointment.class);
-                            appointment.setId(documentSnapshot.getId()); // Set the document ID in the Appointment object
+                            appointment.setId(documentSnapshot.getId());
                             userAppointments.add(appointment);
                         }
 
-                        // Display user appointments
                         for (Appointment appointment : userAppointments) {
-                            // Create TextView for each appointment
                             TextView appointmentTextView = new TextView(this);
                             appointmentTextView.setText("Appointment\n" +
                                     "Date: " + appointment.getDate() + "\n" +
                                     "Time: " + appointment.getTime());
 
-                            // Create Button for deleting appointment
                             Button deleteButton = new Button(this);
                             deleteButton.setText("Delete Appointment");
-                            deleteButton.setOnClickListener(view -> deleteAppointment(appointment));
+                            deleteButton.setOnClickListener(view -> deleteAppointment(appointment.getId()));
 
-                            // Add the appointment text view and delete button to the appointments layout
+                            Button completeButton = new Button(this);
+                            completeButton.setText("Complete Appointment");
+                            completeButton.setOnClickListener(view -> completeAppointment(appointment.getId()));
+
                             appointmentsLayout.addView(appointmentTextView);
                             appointmentsLayout.addView(deleteButton);
+                            appointmentsLayout.addView(completeButton);
                         }
                     })
                     .addOnFailureListener(e -> {
-                        // Handle error while fetching user appointments
                         e.printStackTrace();
                     });
         }
     }
 
-
-    private void deleteAppointment(Appointment appointment) {
-        Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show(); // Show "Clicked" message
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        String appointmentsCollection = "appointments";
-        Toast.makeText(this, "clicked", Toast.LENGTH_SHORT).show();
-
-        // Delete the appointment from Firestore using its ID
-        db.collection(appointmentsCollection)
-                .document(appointment.getId()) // Using the retrieved document ID
-                .delete()
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Appointment deleted successfully", Toast.LENGTH_SHORT).show();
-                    fetchUserAppointments(); // Refresh the displayed appointments
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Failed to delete appointment", Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                });
-    }
-
-
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.home:
-                // Handle Home menu item selection
-                // Example: navigate to HomeFragment
                 navigateToHomeFragment();
                 return true;
             case R.id.contact:
-                // Handle Contact Us menu item selection
-                // Example: navigate to ContactFragment
                 navigateToContactFragment();
                 return true;
             case R.id.profile:
-                // Handle Profile menu item selection
-                // Example: navigate to ProfileFragment
                 navigateToProfileFragment();
                 return true;
             default:

@@ -8,13 +8,22 @@ public class Appointment {
     private String location;
     private String userId;
     private String userName;
+    private String status; // Added status property
 
     public Appointment() {
         // Empty constructor required for Firestore
+        // Set default values here
+        title = "Haircut and Trim";
+        location = "Haifa st35"; // Set default location
+        status = "Pending";
     }
 
     public Appointment(String date) {
         this.date = date;
+        // Set default values here
+        title = "Haircut and Trim";
+        location = "Haifa st35"; // Set default location
+        status = "Pending";
     }
 
     public Appointment(String userId, String userName, String date, String time) {
@@ -22,6 +31,10 @@ public class Appointment {
         this.userName = userName;
         this.date = date;
         this.time = time;
+        // Set default values here
+        title = "Haircut and Trim";
+        location = "Haifa st35"; // Set default location
+        status = "Pending";
     }
 
     public Appointment(String title, String date, String time, String location, String userId, String userName) {
@@ -31,6 +44,8 @@ public class Appointment {
         this.location = location;
         this.userId = userId;
         this.userName = userName;
+        // Set default values here
+        status = "Pending";
     }
 
     public String getId() {
@@ -85,7 +100,16 @@ public class Appointment {
         return location;
     }
 
+
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
