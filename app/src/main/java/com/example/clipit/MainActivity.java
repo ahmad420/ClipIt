@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +24,7 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements BottomNavigationView.OnNavigationItemSelectedListener {
     private BottomNavigationView bottomNavigationView;
-    private TextView appointmentsTextView;
+    private LinearLayout appointmentsLayout; // LinearLayout to hold appointment TextViews
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
-        appointmentsTextView = findViewById(R.id.appointmentsTextView);
+        appointmentsLayout = findViewById(R.id.appointmentsLayout); // Initialize the appointments layout
 
         fetchUserAppointments();
     }
@@ -51,6 +52,8 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     .whereEqualTo("userId", userId) // userId is the ID of the logged-in user
                     .get()
                     .addOnSuccessListener(querySnapshot -> {
+                        appointmentsLayout.removeAllViews(); // Clear existing views
+
                         List<Appointment> userAppointments = new ArrayList<>();
                         for (QueryDocumentSnapshot documentSnapshot : querySnapshot) {
                             // Convert each document to an Appointment object and add to the list
@@ -60,20 +63,22 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                         }
 
                         // Display user appointments
-                        StringBuilder appointmentsText = new StringBuilder();
                         for (Appointment appointment : userAppointments) {
-                            appointmentsText.append("Appointment").append("\n");
-                            appointmentsText.append("Date: ").append(appointment.getDate()).append("\n");
-                            appointmentsText.append("Time: ").append(appointment.getTime()).append("\n");
+                            // Create TextView for each appointment
+                            TextView appointmentTextView = new TextView(this);
+                            appointmentTextView.setText("Appointment\n" +
+                                    "Date: " + appointment.getDate() + "\n" +
+                                    "Time: " + appointment.getTime());
 
-                            // Add a delete button for each appointment
+                            // Create Button for deleting appointment
                             Button deleteButton = new Button(this);
-                            deleteButton.setText("\nDelete Appointment");
+                            deleteButton.setText("Delete Appointment");
                             deleteButton.setOnClickListener(view -> deleteAppointment(appointment));
 
-                            appointmentsText.append(deleteButton.getText()).append("\n\n");
+                            // Add the appointment text view and delete button to the appointments layout
+                            appointmentsLayout.addView(appointmentTextView);
+                            appointmentsLayout.addView(deleteButton);
                         }
-                        appointmentsTextView.setText(appointmentsText.toString());
                     })
                     .addOnFailureListener(e -> {
                         // Handle error while fetching user appointments
@@ -81,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigationV
                     });
         }
     }
+
 
     private void deleteAppointment(Appointment appointment) {
         Toast.makeText(this, "Clicked", Toast.LENGTH_SHORT).show(); // Show "Clicked" message
