@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,12 +29,16 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
     private TextView textViewEmail;
     private TextView textViewName;
     private Button buttonLogout;
-
+    private Button buttonResetPassword;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
+        // hide the top of the app
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
@@ -43,6 +48,11 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
 
         buttonLogout.setOnClickListener(this);
 
+
+        buttonLogout = findViewById(R.id.buttonLogout);
+        buttonResetPassword = findViewById(R.id.Rst_button); // Initialize the new button
+
+        buttonResetPassword.setOnClickListener(this);
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(this);
 
@@ -120,6 +130,7 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
         }
     }
 
+
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.buttonLogout) {
@@ -128,9 +139,21 @@ public class Profile extends AppCompatActivity implements View.OnClickListener, 
             Intent intent = new Intent(Profile.this, Login.class);
             startActivity(intent);
             finish();
+        } else if (view.getId() == R.id.Rst_button) {
+            // Reset the user's password using Firebase Auth
+            FirebaseUser user = mAuth.getCurrentUser();
+            if (user != null) {
+                mAuth.sendPasswordResetEmail(user.getEmail())
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(Profile.this, "Password reset email sent.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(Profile.this, "Failed to send password reset email.", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            }
         }
     }
-
 
 
     private void navigateToHomeFragment() {

@@ -29,7 +29,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
     Button buttonLogin;
     FirebaseAuth mAuth;
     ProgressBar progressBar;
-    TextView textView, theMsg2,goRegieter;
+    TextView textView, theMsg2,goRegieter,goToResetPass;
 
 //    @Override
 //    public void onStart() {
@@ -59,6 +59,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
             case R.id.goRegieter:
                 goToRegisterPage();
                 break;
+            case R.id.forgot_password_link:
+                navToPage();
+                break;
+
         }
     }
 
@@ -71,6 +75,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
         textView = findViewById(R.id.forgot_password_link);
         theMsg2 = findViewById(R.id.msg);
         goRegieter=findViewById(R.id.goRegieter);
+        goToResetPass=findViewById(R.id.forgot_password_link);
     }
 
     private void loginAction(View view) {
@@ -130,6 +135,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
         buttonLogin.setOnClickListener(this);
         textView.setOnClickListener(this);
         goRegieter.setOnClickListener(this);
+        goToResetPass.setOnClickListener(this);
 
     }
 
@@ -149,4 +155,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
         }, 8000);
     }
 
+    public void navToPage() {
+        Intent intent = new Intent(getApplicationContext(), Forgot_Password.class);
+        startActivity(intent);
+        finish();
+
     }
+}

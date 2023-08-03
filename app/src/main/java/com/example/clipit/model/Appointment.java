@@ -1,6 +1,7 @@
 package com.example.clipit.model;
 
 public class Appointment {
+    private String id;
     private String title;
     private String date;
     private String time;
@@ -8,21 +9,21 @@ public class Appointment {
     private String userId;
     private String userName;
 
-
     public Appointment() {
         // Empty constructor required for Firestore
     }
 
-
     public Appointment(String date) {
         this.date = date;
     }
-    public Appointment(   String userId ,String userName,String date, String time) {
-        this.userId= userId;
-        this.userName=userName;
+
+    public Appointment(String userId, String userName, String date, String time) {
+        this.userId = userId;
+        this.userName = userName;
         this.date = date;
         this.time = time;
     }
+
     public Appointment(String title, String date, String time, String location, String userId, String userName) {
         this.title = title;
         this.date = date;
@@ -32,6 +33,14 @@ public class Appointment {
         this.userName = userName;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -39,7 +48,6 @@ public class Appointment {
     public void setTitle(String title) {
         this.title = title;
     }
-
 
     public String getDate() {
         return date;
@@ -66,14 +74,12 @@ public class Appointment {
     }
 
     public String getUserName() {
-
         return userName;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
     }
-
 
     public String getLocation() {
         return location;
