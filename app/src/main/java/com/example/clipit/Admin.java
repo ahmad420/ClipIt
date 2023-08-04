@@ -59,8 +59,8 @@ public class Admin extends AppCompatActivity {
 
                         // Create TextView to display appointment details
                         TextView appointmentTextView = new TextView(this);
-                        appointmentTextView.setText(appointment.getTitle()+":\n "+ appointment.getUserName() + "\n" +
-                                "Time: " + appointment.getTime()+"\n\n");
+                        appointmentTextView.setText(appointment.getTitle()+":\n"+ "Client :"+appointment.getUserName() + "\n" +
+                                "Time: " + appointment.getTime()+"\n"+"Status: "+appointment.getStatus());
 
 //                        // Create Delete Button
 //                        Button deleteButton = new Button(this);

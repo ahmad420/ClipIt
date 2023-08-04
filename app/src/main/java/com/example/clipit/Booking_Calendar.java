@@ -56,12 +56,24 @@ public class Booking_Calendar extends AppCompatActivity  implements BottomNaviga
         // Set the current date as the default date for the calendar view
         calendarView.setDate(calendar.getTimeInMillis());
         checkAppointmentsForToday();
+
         // Set the date change listener to update the current date
         calendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 try {
-                    calendar.set(year, month, dayOfMonth);
+                    Calendar selectedCalendar = Calendar.getInstance();
+                    selectedCalendar.set(year, month, dayOfMonth);
+
+                    // Get the current date
+                    Calendar currentDate = Calendar.getInstance();
+
+                    // Check if the selected date is before the current date
+                    if (selectedCalendar.before(currentDate)) {
+                        Toast.makeText(Booking_Calendar.this, "Please select a date that is not in the past.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
                     Toast.makeText(Booking_Calendar.this, year + " " + month + " " + dayOfMonth, Toast.LENGTH_SHORT).show();
                     // Example: Create an appointment for the selected date
                     appointment.setDate(formatDate(year, month, dayOfMonth));
@@ -102,10 +114,20 @@ public class Booking_Calendar extends AppCompatActivity  implements BottomNaviga
             int hour = currentTime.get(Calendar.HOUR_OF_DAY);
             int minute = currentTime.get(Calendar.MINUTE);
 
+            // Limit the starting and ending hours for time picker
+            int startingHour = 10;
+            int endingHour = 20;
+
             TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                     new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                            // Check if the selected time is within the allowed range (10 AM to 8 PM)
+                            if (selectedHour < startingHour || (selectedHour == endingHour && selectedMinute > 0) || selectedHour >= endingHour) {
+                                Toast.makeText(Booking_Calendar.this, "Please select a valid time between 10 AM and 8 PM.", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
                             // Update the selected time in the Appointment object
                             selectedTime = formatTime(selectedHour, selectedMinute);
 
@@ -115,11 +137,16 @@ public class Booking_Calendar extends AppCompatActivity  implements BottomNaviga
                         }
                     }, hour, minute, false);
 
+            // Set the time range for the time picker
+            timePickerDialog.updateTime(startingHour, 0);
+
+            // Show the time picker dialog
             timePickerDialog.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
 
     private String formatDate(int year, int month, int dayOfMonth) {
         try {
@@ -150,12 +177,70 @@ public class Booking_Calendar extends AppCompatActivity  implements BottomNaviga
         }
     }
 
+    // Function to check if an appointment already exists within 20 minutes of the selected time
+    private void checkExistingAppointments(FirebaseFirestore db, String appointmentsCollection, String selectedDate, String selectedTime) {
+        String[] timeParts = selectedTime.split(":");
+        int selectedHour = Integer.parseInt(timeParts[0]);
+        int selectedMinute = Integer.parseInt(timeParts[1].split(" ")[0]);
+
+        int adjustedHourBefore = selectedHour;
+        int adjustedMinuteBefore = selectedMinute - 20;
+        if (adjustedMinuteBefore < 0) {
+            adjustedMinuteBefore += 60;
+            adjustedHourBefore--;
+        }
+
+        String timeBefore20Mins = String.format(Locale.getDefault(), "%02d:%02d %s",
+                adjustedHourBefore % 12 == 0 ? 12 : adjustedHourBefore % 12, adjustedMinuteBefore,
+                adjustedHourBefore < 12 ? "AM" : "PM");
+
+        // Query to check for existing appointments within 20 minutes before and after the selected time
+        db.collection(appointmentsCollection)
+                .whereEqualTo("date", selectedDate)
+                .whereIn("time", Arrays.asList(selectedTime, timeBefore20Mins))
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots.isEmpty()) {
+                        // No existing appointment found within the specified time range, proceed to create a new one
+                        createNewAppointment(db, appointmentsCollection, selectedDate, selectedTime);
+                    } else {
+                        // Existing appointment found within the specified time range
+                        Toast.makeText(Booking_Calendar.this, "An appointment already exists within 20 minutes of the selected time.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    // Error occurred while checking for existing appointments
+                    Toast.makeText(Booking_Calendar.this, "Failed to check existing appointments", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    // Function to create a new appointment
+    private void createNewAppointment(FirebaseFirestore db, String appointmentsCollection, String selectedDate, String selectedTime) {
+        // Set the selected time in the Appointment object
+        appointment.setTime(selectedTime);
+
+        // Set the user ID and user name in the Appointment object
+        appointment.setUserId(userId);
+        appointment.setUserName(userName);
+
+        // Add the appointment to the database
+        db.collection(appointmentsCollection)
+                .add(appointment)
+                .addOnSuccessListener(documentReference -> {
+                    // Appointment successfully saved to the database
+                    Toast.makeText(Booking_Calendar.this, "Appointment created for " + appointment.getUserName() + " on " + appointment.getDate() + " at " + appointment.getTime(), Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    // Error occurred while saving the appointment
+                    Toast.makeText(Booking_Calendar.this, "Failed to create appointment", Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    // In your createAppointment method:
     public void createAppointment(View view) {
         try {
-            if (isUserHasAppointmentsToday)
-            {
-                Toast.makeText(this, "you have an appointment today please try again later if you want to make another reservation ", Toast.LENGTH_SHORT).show();
-
+            if (isUserHasAppointmentsToday) {
+                Toast.makeText(this, "You have an appointment today. Please try again later if you want to make another reservation.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -167,94 +252,7 @@ public class Booking_Calendar extends AppCompatActivity  implements BottomNaviga
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             String appointmentsCollection = "appointments";
 
-            // Query to check for existing appointments on the selected date and user
-            db.collection(appointmentsCollection)
-                    .whereEqualTo("userId", userId)
-                    .whereEqualTo("date", appointment.getDate())
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
-                        if (queryDocumentSnapshots.isEmpty()) {
-                            // No existing appointment found, proceed to create a new one
-
-                            // Validate the selected time to be between 10 AM and 8 PM
-                            String[] parts = selectedTime.split(":");
-                            int hourOfDay = Integer.parseInt(parts[0]);
-                            int minute = Integer.parseInt(parts[1].split(" ")[0]);
-                            String amPm = parts[1].split(" ")[1];
-
-                            if ((hourOfDay < 10 || (hourOfDay == 8 && minute > 0) || hourOfDay >= 8) && amPm.equals("PM")) {
-                                Toast.makeText(this, "Please select a valid time between 10 AM and 8 PM.", Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-
-                            // Calculate the time 30 minutes before and after the selected time
-                            int adjustedHourBefore = hourOfDay;
-                            int adjustedMinuteBefore = minute - 30;
-                            if (adjustedMinuteBefore < 0) {
-                                adjustedMinuteBefore += 60;
-                                adjustedHourBefore--;
-                            }
-
-                            int adjustedHourAfter = hourOfDay;
-                            int adjustedMinuteAfter = minute + 30;
-                            if (adjustedMinuteAfter >= 60) {
-                                adjustedMinuteAfter -= 60;
-                                adjustedHourAfter++;
-                            }
-
-                            String timeBefore30Mins = String.format(Locale.getDefault(), "%02d:%02d %s",
-                                    adjustedHourBefore % 12 == 0 ? 12 : adjustedHourBefore % 12, adjustedMinuteBefore,
-                                    adjustedHourBefore < 12 ? "AM" : "PM");
-
-                            String timeAfter30Mins = String.format(Locale.getDefault(), "%02d:%02d %s",
-                                    adjustedHourAfter % 12 == 0 ? 12 : adjustedHourAfter % 12, adjustedMinuteAfter,
-                                    adjustedHourAfter < 12 ? "AM" : "PM");
-
-                            // Query to check for existing appointments within 30 minutes before and after the selected time
-                            db.collection(appointmentsCollection)
-                                    .whereEqualTo("date", appointment.getDate())
-                                    .whereIn("time", Arrays.asList(selectedTime, timeBefore30Mins, timeAfter30Mins))
-                                    .get()
-                                    .addOnSuccessListener(queryDocumentSnapshots1 -> {
-                                        if (queryDocumentSnapshots1.isEmpty()) {
-                                            // No existing appointment found within the specified time range, proceed to create a new one
-                                            // Set the selected time in the Appointment object
-                                            appointment.setTime(selectedTime);
-
-                                            // Set the user ID and user name in the Appointment object
-                                            appointment.setUserId(userId);
-                                            appointment.setUserName(userName);
-
-                                            // Add the appointment to the database
-                                            db.collection(appointmentsCollection)
-                                                    .add(appointment)
-                                                    .addOnSuccessListener(documentReference -> {
-                                                        // Appointment successfully saved to the database
-                                                        Toast.makeText(Booking_Calendar.this, "Appointment created for " + appointment.getUserName() + " on " + appointment.getDate() + " at " + appointment.getTime(), Toast.LENGTH_SHORT).show();
-                                                    })
-                                                    .addOnFailureListener(e -> {
-                                                        // Error occurred while saving the appointment
-                                                        Toast.makeText(Booking_Calendar.this, "Failed to create appointment", Toast.LENGTH_SHORT).show();
-                                                    });
-                                        } else {
-                                            // Existing appointment found within the specified time range
-                                            Toast.makeText(Booking_Calendar.this, "An appointment already exists within 30 minutes of the selected time.", Toast.LENGTH_SHORT).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        // Error occurred while checking for existing appointments
-                                        Toast.makeText(Booking_Calendar.this, "Failed to check existing appointments", Toast.LENGTH_SHORT).show();
-                                    });
-                        } else {
-                            // Existing appointment found on the selected date
-                            Toast.makeText(Booking_Calendar.this, "An appointment already exists on this date.", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnFailureListener(e -> {
-                        // Error occurred while checking for existing appointments
-                        Toast.makeText(Booking_Calendar.this, "Failed to check existing appointments", Toast.LENGTH_SHORT).show();
-                    });
-
+            checkExistingAppointments(db, appointmentsCollection, appointment.getDate(), selectedTime);
         } catch (Exception e) {
             e.printStackTrace();
         }

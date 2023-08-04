@@ -34,15 +34,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
     TextView textView, theMsg2, goRegister, goToResetPass;
 
 
-    public void onStart() {
-        super.onStart();
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            Intent intent = new Intent(getApplicationContext(), Admin.class);
-            startActivity(intent);
-            finish();
-        }
-    }
+//    public void onStart() {
+//        super.onStart();
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            Intent intent = new Intent(getApplicationContext(), Admin.class);
+//            startActivity(intent);
+//            finish();
+//        }
+//    }
 
 
     @Override
@@ -51,6 +51,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener  {
         setContentView(R.layout.activity_login);
         initViews();
         initButtons();
+
+        // Hide the top of the app
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
+
     }
 
     @Override
